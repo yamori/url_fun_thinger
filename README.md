@@ -6,7 +6,7 @@ URL shortener with a twist.
 
 `make buildrun`
 
---> [localhost:80](http://localhost:80/)
+--> [localhost:8080](http://localhost:8080/)
 
 # Things I Learned
 

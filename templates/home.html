@@ -1,0 +1,16 @@
+<!-- forms.html -->
+<html>
+    <head></head>
+    <body>
+        {{if .Success}}
+            <h1>URL submit successful...</h1>
+        {{else}}
+            <h1>Contact</h1>
+            <form method="POST">
+                <label>URL to be shortened:</label><br />
+                <input type="text" name="URLstr"><br />
+                <input type="submit">
+            </form>
+        {{end}}
+    </body>
+</html>
