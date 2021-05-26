@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -19,8 +20,15 @@ type URLSubmit struct {
 	Success   bool
 }
 
+//go:embed templates/*
+var templateData embed.FS
+
 func main() {
-	tmpl := template.Must(template.ParseFiles("templates/home.html"))
+
+	tmpl, err := template.ParseFS(templateData, "templates/home.html")
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
