@@ -2,12 +2,21 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"text/template"
 )
 
+var quantity = []string{"two", "three", "four", "five", "six", "eight", "nine", "ten", "twelve"}
+var adjectives = []string{"merry", "witty", "lovely", "sweet", "nice", "fine",
+	"chill", "fresh"}
+var nouns = []string{"cats", "dogs", "birds", "chairs", "trees", "books", "clouds",
+	"fish"}
+
 type URLSubmit struct {
-	URLstr string
+	URLstr    string
+	Shortened string
+	Success   bool
 }
 
 func main() {
@@ -19,16 +28,23 @@ func main() {
 			return
 		}
 
+		rQuantity := quantity[rand.Intn(len(quantity))]
+		rAjective := adjectives[rand.Intn(len(adjectives))]
+		rNoun := nouns[rand.Intn(len(nouns))]
+
 		details := URLSubmit{
-			URLstr: r.FormValue("URLstr"),
+			URLstr:    r.FormValue("URLstr"),
+			Shortened: rQuantity + rAjective + rNoun,
+			Success:   true,
 		}
 
 		// do something with details
 		_ = details
 		fmt.Println(details)
 
-		tmpl.Execute(w, struct{ Success bool }{true})
+		tmpl.Execute(w, details)
 	})
 
 	http.ListenAndServe(":8080", nil)
+
 }
