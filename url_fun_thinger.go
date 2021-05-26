@@ -2,10 +2,14 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"os"
 	"text/template"
+	"time"
 )
 
 var quantity = []string{"two", "three", "four", "five", "six", "eight", "nine", "ten", "twelve"}
@@ -23,6 +27,41 @@ type URLSubmit struct {
 //go:embed templates/*
 var templateData embed.FS
 
+func persistShortened(shortened string, URLstr string) bool {
+	// return 'false' if the 'shortened' is already in use
+
+	jsonFileName := "persisted.json"
+
+	jsonFile, err := os.Open(jsonFileName)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var objmap map[string]interface{}
+	if err := json.Unmarshal(byteValue, &objmap); err != nil {
+		fmt.Println(err)
+	}
+
+	if _, ok := objmap[shortened]; !ok {
+		objmap[shortened] = URLstr
+		file, _ := json.MarshalIndent(objmap, "", "  ")
+		_ = ioutil.WriteFile(jsonFileName, file, 0644)
+		return true
+	}
+
+	// otherwise
+	return false
+}
+
+func randomShortened() string {
+	rand.Seed(time.Now().UnixNano())
+	rQuantity := quantity[rand.Intn(len(quantity))]
+	rAjective := adjectives[rand.Intn(len(adjectives))]
+	rNoun := nouns[rand.Intn(len(nouns))]
+	return rQuantity + rAjective + rNoun
+}
+
 func main() {
 
 	tmpl, err := template.ParseFS(templateData, "templates/home.html")
@@ -36,19 +75,19 @@ func main() {
 			return
 		}
 
-		rQuantity := quantity[rand.Intn(len(quantity))]
-		rAjective := adjectives[rand.Intn(len(adjectives))]
-		rNoun := nouns[rand.Intn(len(nouns))]
+		shortened := randomShortened()
+
+		// Retry random string if already exists
+		for written := persistShortened(shortened, r.FormValue("URLstr")); !written; written = persistShortened(shortened, r.FormValue("URLstr")) {
+			fmt.Printf("colision detect: %v\n", shortened)
+			shortened = randomShortened()
+		}
 
 		details := URLSubmit{
 			URLstr:    r.FormValue("URLstr"),
-			Shortened: rQuantity + rAjective + rNoun,
+			Shortened: shortened,
 			Success:   true,
 		}
-
-		// do something with details
-		_ = details
-		fmt.Println(details)
 
 		tmpl.Execute(w, details)
 	})
