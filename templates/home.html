@@ -1,17 +1,47 @@
 <!-- forms.html -->
 <html>
-    <head></head>
+    <head>
+        <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+        <link href="http://fonts.cdnfonts.com/css/kongtext" rel="stylesheet">
+        <style>
+            html, body, pre, code, kbd, samp {
+                font-family: 'Kongtext', sans-serif;;
+            } 
+            body {
+                padding-top: 20px;
+            }
+            #url_input, #code_output {
+                width:70%;
+                min-width:100px;
+                margin-bottom: 10px;
+            }
+            #code_output {
+                text-align: center; 
+            }
+            .centering {
+                text-align:center
+            }
+        </style>
+    </head>
     <body>
-        {{if .Success}}
-            <h1>URL submit successful...</h1>
-            <h3>{{.Shortened}}</h3>
-        {{else}}
-            <h1>Contact</h1>
-            <form method="POST">
-                <label>URL to be shortened:</label><br />
-                <input type="text" name="URLstr"><br />
-                <input type="submit">
-            </form>
-        {{end}}
+        <div class="container">
+            <main class="main-content">
+                {{if .Success}}
+                <div class="centering">
+                    <h1 class="nes-text is-primary">conversion successful</h1>
+                    <input id="code_output" type="text" name="URLstr" class="nes-input is-success" value="{{.Shortened}}">
+                    <p><a href="/">back</a></p>
+                </div>
+                {{else}}
+                    <div class="centering">
+                        <h1>Convert your URL</h1>
+                        <form method="POST">
+                            <input id="url_input" type="text" name="URLstr" class="nes-input" placeholder="http://..."><br />
+                            <button type="submit" class="nes-btn is-primary">Wham!</button>
+                        </form>
+                    </div>
+                {{end}}
+            </main>
+        </div>
     </body>
 </html>
