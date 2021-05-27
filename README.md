@@ -8,6 +8,10 @@ URL shortener with a twist.
 
 --> [localhost:8080](http://localhost:8080/)
 
+## CSS library
+
+[NES.css](https://nostalgic-css.github.io/NES.css/)
+
 # Things I Learned
 
 - Starting a go module: `go mod init (module name e.g. domain/app_name`)
