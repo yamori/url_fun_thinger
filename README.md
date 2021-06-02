@@ -18,6 +18,10 @@ URL shortener with a twist.
 - Exported identifiers (variable, function, struct key, etc.) are not exported (to another package) if it begins with a lowercase letter.
 - Random values, it's necessary to initialize the source within the `rand` module.  `rand.Seed(time.Now().UnixNano())` or read more [here](https://stackoverflow.com/a/39529428)
 
+## TODO / Fixes
+
+- Lacking a routing framework like `mux`, as an unsuccessful POST to `/lookup` needs an error message to be displayed but the URL ends up as `lookup`.
+
 # EC2 hosting
 
 ```

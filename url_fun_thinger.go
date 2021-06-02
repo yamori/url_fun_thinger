@@ -22,6 +22,14 @@ type URLSubmit struct {
 	URLstr    string
 	Shortened string
 	Success   bool
+	ErrorMsg  string
+}
+
+var default_URLSubmit = URLSubmit{
+	URLstr:    "",
+	Shortened: "",
+	Success:   false,
+	ErrorMsg:  "",
 }
 
 //go:embed templates/*
@@ -71,7 +79,7 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			tmpl.Execute(w, nil)
+			tmpl.Execute(w, default_URLSubmit)
 			return
 		}
 
@@ -87,9 +95,28 @@ func main() {
 			URLstr:    r.FormValue("URLstr"),
 			Shortened: shortened,
 			Success:   true,
+			ErrorMsg:  "",
 		}
 
 		tmpl.Execute(w, details)
+	})
+
+	http.HandleFunc("/lookup", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			// (this should not be reachable)
+			tmpl.Execute(w, default_URLSubmit)
+			return
+		} else {
+			error_URLSubmit := URLSubmit{
+				URLstr:    "",
+				Shortened: "",
+				Success:   false,
+				ErrorMsg:  "We could not provide the code you supplied!!!",
+			}
+
+			tmpl.Execute(w, error_URLSubmit)
+			return
+		}
 	})
 
 	http.ListenAndServe(":8080", nil)

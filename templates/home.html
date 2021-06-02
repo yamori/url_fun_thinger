@@ -10,16 +10,23 @@
             body {
                 padding-top: 20px;
             }
-            #url_input, #code_output {
+            #url_input, #code_output, #code_input {
                 width:70%;
                 min-width:100px;
                 margin-bottom: 10px;
             }
-            #code_output {
+            #code_output, #code_input {
                 text-align: center; 
             }
             .centering {
                 text-align:center
+            }
+            p {
+                max-width: 600px;
+                margin: auto;
+            }
+            #conver_h2 {
+                margin-top: 55px;
             }
         </style>
     </head>
@@ -34,10 +41,18 @@
                 </div>
                 {{else}}
                     <div class="centering">
-                        <h1>Convert your URL</h1>
-                        <form method="POST">
+                        <h1>Enter Code</h1>
+                        <p>(for redirection to the secret URL)</p>
+                        <p class="nes-text is-error">{{.ErrorMsg}}</p>
+                        <form method="POST" action="lookup">
+                            <input id="code_input" type="text" name="codedURL" class="nes-input" placeholder="threeblindmice"><br />
+                            <button type="submit" class="nes-btn is-primary">GO!!!</button>
+                        </form>
+                        <h2 id="conver_h2">Or Convert your URL</h2>
+                        <p>Compress your annoyingly lengthy URL into a three-word phrase, then share with friends, fam, and your favorite NES characters!</p>
+                        <form method="POST" action="/">
                             <input id="url_input" type="text" name="URLstr" class="nes-input" placeholder="http://..."><br />
-                            <button type="submit" class="nes-btn is-primary">Wham!</button>
+                            <button type="submit" class="nes-btn is-primary">Conver!!!</button>
                         </form>
                     </div>
                 {{end}}
