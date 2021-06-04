@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+var jsonFileName = "persisted.json"
+
 var quantity = []string{"two", "three", "four", "five", "six", "eight", "nine", "ten", "twelve"}
 var adjectives = []string{"merry", "witty", "lovely", "sweet", "nice", "fine",
 	"chill", "fresh"}
@@ -38,8 +40,6 @@ var templateData embed.FS
 func persistShortened(shortened string, URLstr string) bool {
 	// return 'false' if the 'shortened' is already in use
 
-	jsonFileName := "persisted.json"
-
 	jsonFile, err := os.Open(jsonFileName)
 	if err != nil {
 		fmt.Println(err)
@@ -62,6 +62,26 @@ func persistShortened(shortened string, URLstr string) bool {
 	return false
 }
 
+func findShortened(shortened string) (bool, string) {
+
+	jsonFile, err := os.Open(jsonFileName)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var objmap map[string]interface{}
+	if err := json.Unmarshal(byteValue, &objmap); err != nil {
+		fmt.Println(err)
+	}
+
+	if _, ok := objmap[shortened]; !ok {
+		return false, ""
+	}
+
+	return true, objmap[shortened].(string)
+}
+
 func randomShortened() string {
 	rand.Seed(time.Now().UnixNano())
 	rQuantity := quantity[rand.Intn(len(quantity))]
@@ -73,6 +93,11 @@ func randomShortened() string {
 func main() {
 
 	tmpl, err := template.ParseFS(templateData, "templates/home.html")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	tmpl_redirect, err := template.ParseFS(templateData, "templates/redirect.html")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -107,15 +132,26 @@ func main() {
 			tmpl.Execute(w, default_URLSubmit)
 			return
 		} else {
-			error_URLSubmit := URLSubmit{
-				URLstr:    "",
-				Shortened: "",
-				Success:   false,
-				ErrorMsg:  "We could not provide the code you supplied!!!",
+			exists, decodedURL := findShortened(r.FormValue("codedURL"))
+			if !exists {
+				error_URLSubmit := URLSubmit{
+					URLstr:    "",
+					Shortened: "",
+					Success:   false,
+					ErrorMsg:  "We could not provide the code you supplied!!!",
+				}
+				tmpl.Execute(w, error_URLSubmit)
+				return
+			} else {
+				details_redirectURL := URLSubmit{
+					URLstr:    decodedURL,
+					Shortened: "",
+					Success:   true,
+					ErrorMsg:  "",
+				}
+				tmpl_redirect.Execute(w, details_redirectURL)
+				return
 			}
-
-			tmpl.Execute(w, error_URLSubmit)
-			return
 		}
 	})
 
